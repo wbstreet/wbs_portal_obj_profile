@@ -1,0 +1,55 @@
+<script>
+    "use nstrict"
+
+    function add_skill(btn) {
+        sendform(btn, 'add_skill', {
+            arg_func_success: btn,
+            func_success(res, btn) {
+                let skills = document.getElementById('skills');
+                let skill = document.createElement('div');
+                skill.innerHTML = res.data.skill + "<input type=\"button\" value=\"X\" style=\"padding:0 2px 0 2px;margin:0;\" onclick=\"delete_skill(this, '" +res.data.skill_id+ "')\">";
+                skills.appendChild(skill);
+                btn.form.skill.value = "";
+            },
+            url:WB_URL+'/modules/wbs_portal_obj_profile/api.php'
+        });
+    }
+
+    function delete_skill(btn, skill_id) {
+        sendform(btn, 'delete_skill', {
+            arg_func_success: btn,
+            data: {skill_id: skill_id},
+            func_success(res, btn) {
+                btn.parentElement.remove();
+            },
+            url:WB_URL+'/modules/wbs_portal_obj_profile/api.php'
+        });
+    }
+</script>
+
+<h2> Пользователь {{ profile.name }} {{ profile.surname }} </h2>
+
+<table>
+    <tr>
+        <td>E-mail:</td>
+        <td>{{ profile.email }}</td>
+    </tr>
+    <tr>
+        <td>В предыдущий раз заходили:</td>
+        <td>{{ profile.login_when }} с IP-адреса {{ profile.login_ip }}</td>
+    </tr>
+    <tr>
+        <td>Специализация:</td>
+        <td>
+            <div id='skills'>
+                {% for skill in skills %}
+                    <div>{{ skill.skill }} <input type="button" value="X" style="padding:0 2px 0 2px;margin:0;" onclick="delete_skill(this, '{{ skill.skill_id }}')"></div>
+                {% endfor %}
+            </div>
+            <form>
+                <input type="input" name="skill" value="" placeholder="введите специализацию">
+                <input type="button" value="Добавить" onclick="add_skill(this)">
+            </form>
+        </td>
+    </tr>
+</table>
