@@ -11,34 +11,6 @@ require_once(WB_PATH."/framework/class.admin.php");
 $admin = new admin('Start', '', false, false);
 $clsModPortalObjProfile = new ModPortalObjProfile(null, null);
 
-function insert_row_uniq($table, $fields, $keys_uniq=false, $key_ret=false) {
-    global $database;
-
-    if ($keys_uniq === false) $keys_uniq = array_keys($fields);
-    //if ($keys_ret === false) $keys_ret = [];
-
-    if (gettype($keys_uniq) === 'string') $keys_uniq = [$eys_uniq];
-    //if (gettype($keys_ret) === 'string') $keys_ret = [$keys_ret];
-
-    $select = $key_ret === false ? $keys_uniq : array_merge($keys_uniq, [$key_ret]);
-
-    $where = [];
-    foreach($keys_uniq as $key) $where[$key] = $fields[$key];
-
-    $r = select_row($table, glue_keys($select), glue_fields($where, ' AND '));
-    if (gettype($r) === 'string') return $r;
-    else if ($r === null) {
-        $r = insert_row($table, $fields);
-        if (gettype($r) === 'string') return $r;
-        return (integer)($database->getLastInsertId());
-    }
-    
-    if ($key_ret !== false) {
-        $fields = $r->fetchRow();
-        return (integer)($fields[$key_ret]);
-    }
-}
-
 if ($action == 'add_skill') {
     
     check_auth(); //check_all_permission($page_id, ['pages_modify']);

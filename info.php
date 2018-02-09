@@ -3,7 +3,7 @@
 /**
  *
  * @category        module
- * @package         wbs_profile
+ * @package         wbs_portal_obj_profile
  * @author          Polyakov Konstantin
  * @license         http://www.gnu.org/licenses/gpl.html
  * @platform        WebsiteBaker 2.8.10

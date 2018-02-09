@@ -84,12 +84,7 @@ if ($modPortalArgs['obj_id'] === 'list') {
 
             // отображаем
 
-            $loader = new Twig_Loader_Array(array(
-                'view' => file_get_contents(__DIR__.'/view.html'),
-            ));
-            $twig = new Twig_Environment($loader);
-            
-            echo $twig->render('view', [
+            $clsModPortalObjProfile->render('view.html', [
                'profile'=>$profile,
                'skills'=>$skills,
             ]);
