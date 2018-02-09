@@ -36,8 +36,9 @@
     </tr>
     <tr>
         <td>В предыдущий раз заходили:</td>
-        <td>{{ profile.login_when }} с IP-адреса {{ profile.login_ip }}</td>
+        <td>{{ profile.login_when|date('r') }} с IP-адреса {{ profile.login_ip }}</td>
     </tr>
+
     <tr>
         <td>Специализация:</td>
         <td>
@@ -52,4 +53,71 @@
             </form>
         </td>
     </tr>
+
+    {% if project_exists %}
+    <tr>
+        <td>Проекты</td>
+        <td>
+            Всего проектов: {{ project_count }}.
+
+            {% if projects|length < project_count %}
+                Последние  {{ projects|length }} проектов:
+            {% endif %}
+            
+            <br>
+
+            {% for project in projects %}
+                <a href="{{ project.obj_url }}" target="_blank">{{ project.title }}</a><br>
+            {% endfor %}
+            
+        </td>
+    </tr>
+    {% endif %}
+
+    {% if blog_exists %}
+    <tr>
+        <td>Блог</td>
+        <td>
+            Всего записей: {{ blog_count }}.
+
+            {% if blogs|length < blog_count %}
+                Последние  {{ blogs|length }} записей:
+            {% endif %}
+            
+            <br>
+
+            {% for blog in blogs %}
+                <a href="{{ blog.obj_url }}" target="_blank">{{ blog.title }}</a><br>
+            {% endfor %}
+            
+        </td>
+    </tr>
+    {% endif %}
+
+    {% if apartment_exists %}
+    <tr>
+        <td>Недвижимость</td>
+        <td>
+            Всего объектов: {{ apartment_count }}.
+
+            {% if apartments|length < apartment_count %}
+                Последние  {{ apartments|length }} объектов:
+            {% endif %}
+            
+            <br>
+
+            {% for apartment in apartments %}
+                <a href="{{ apartment.obj_url }}" target="_blank">{{ apartment.name }}</a><br>
+            {% endfor %}
+            
+        </td>
+    </tr>
+    {% endif %}
+
 </table>
+
+<style>
+    div#skills div {
+        display: inline-block;
+    }
+</style>
