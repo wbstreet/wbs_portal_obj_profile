@@ -11,6 +11,8 @@ if ($modPortalArgs['obj_id'] === null) { // здесь у нас не profile_id
     $modPortalArgs['obj_id'] = $admin->get_user_id();
 }
 
+
+
 function get_info($clsModPortalObj, $method, $obj_id) {
     $objs = [];
     $obj_count = 0;
@@ -23,7 +25,8 @@ function get_info($clsModPortalObj, $method, $obj_id) {
         $obj_count = $clsModPortalObj->$method([
             'user_owner_id'=>$modPortalArgs['obj_id'],
             'is_active'=>1,
-            'is_deleted'=>0
+            'is_deleted'=>0,
+            'is_created'=>'1',
             ], true);
         if (gettype($blog_count) === 'string') { $clsModPortalObjBlog->print_error($obj_count); $obj_exists = false;}
     
@@ -36,6 +39,7 @@ function get_info($clsModPortalObj, $method, $obj_id) {
             'limit_count'=>5,
             'order_by'=>'date_created',
             'order_dir'=>'DESC',
+            'is_created'=>'1',
             ]);
         if (gettype($_objs) === 'string') { $clsModPortalObj->print_error($_objs); $obj_exists = false;}
         while($_objs !== null && $obj = $_objs->fetchRow()) {
@@ -113,8 +117,8 @@ if ($modPortalArgs['obj_id'] === 'list') {
     ];
 
     $profiles = $clsModPortalObjProfile->get_profile($opts);
-    if (gettype($profiles) == 'string') echo $profiles;
-    else if ($profiles->numRows() === 0) echo "Пользователь не найден";
+    if (gettype($profiles) === 'string') echo $profiles;
+    else if ($profiles === null || $profiles->numRows() === 0) echo "Пользователь не найден";
     else {
         $profile = $profiles->fetchRow();
         
@@ -162,6 +166,8 @@ if ($modPortalArgs['obj_id'] === 'list') {
             
             // отображаем
 
+            $can_edit = $is_auth && $admin->get_user_id() === $profile['user_owner_id'] ? true : false;
+
             $clsModPortalObjProfile->render('view.html', [
                'profile'=>$profile,
                'skills'=>$skills,
@@ -179,7 +185,9 @@ if ($modPortalArgs['obj_id'] === 'list') {
                'apartments'=>$apartments,
                'apartment_count'=>$apartment_count,
                'apartment_exists'=>$apartment_exists,
-               //'apartment_max_count'=>$apartment_max_count,    
+               //'apartment_max_count'=>$apartment_max_count,  
+               
+               'can_edit'=>$can_edit,
             ]);
             
         }

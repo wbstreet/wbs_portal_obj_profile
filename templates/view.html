@@ -44,13 +44,22 @@
         <td>
             <div id='skills'>
                 {% for skill in skills %}
-                    <div>{{ skill.skill }} <input type="button" value="X" style="padding:0 2px 0 2px;margin:0;" onclick="delete_skill(this, '{{ skill.skill_id }}')"></div>
+                    <div>
+                        {{ skill.skill }}
+                        {% if can_edit %}
+                            <input type="button" value="X" style="padding:0 2px 0 2px;margin:0;" onclick="delete_skill(this, '{{ skill.skill_id }}')">
+                        {% endif %}
+                    </div>
+                    {% if loop.index != loop.length %} <span style="display:inline-block;margin:0 7px"> | </span> {% endif %}
                 {% endfor %}
             </div>
-            <form>
-                <input type="input" name="skill" value="" placeholder="введите специализацию">
-                <input type="button" value="Добавить" onclick="add_skill(this)">
-            </form>
+
+            {% if can_edit %}
+                <form>
+                    <input type="input" name="skill" value="" placeholder="введите специализацию">
+                    <input type="button" value="Добавить" onclick="add_skill(this)">
+                </form>
+            {% endif %}
         </td>
     </tr>
 
