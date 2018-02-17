@@ -121,7 +121,7 @@ class ModPortalObjProfile extends ModPortalObj {
         return true;
     }*/
 
-    function get_profile($sets=[], $only_count=false) {
+    function get_obj($sets=[], $only_count=false) {
         global $sql_builder, $database;
 
         $is_deleted = isset($sets['is_deleted']) ? $database->escapeString($sets['is_deleted']) : null;

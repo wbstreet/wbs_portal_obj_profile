@@ -13,7 +13,7 @@ if ($modPortalArgs['obj_id'] === null) { // здесь у нас не profile_id
 
 
 
-function get_info($clsModPortalObj, $method, $obj_id) {
+function get_info($clsModPortalObj, $obj_id) {
     $objs = [];
     $obj_count = 0;
     $obj_exists = true;
@@ -22,7 +22,7 @@ function get_info($clsModPortalObj, $method, $obj_id) {
 
         // количество записей
     
-        $obj_count = $clsModPortalObj->$method([
+        $obj_count = $clsModPortalObj->get_obj([
             'user_owner_id'=>$modPortalArgs['obj_id'],
             'is_active'=>1,
             'is_deleted'=>0,
@@ -32,7 +32,7 @@ function get_info($clsModPortalObj, $method, $obj_id) {
     
         // первые пять записей
         
-        $_objs = $clsModPortalObj->$method([
+        $_objs = $clsModPortalObj->get_obj([
             'user_owner_id'=>$modPortalArgs['obj_id'],
             'is_active'=>1,
             'is_deleted'=>0,
@@ -116,7 +116,7 @@ if ($modPortalArgs['obj_id'] === 'list') {
         'obj_id'=>$profile_id,
     ];
 
-    $profiles = $clsModPortalObjProfile->get_profile($opts);
+    $profiles = $clsModPortalObjProfile->get_obj($opts);
     if (gettype($profiles) === 'string') echo $profiles;
     else if ($profiles === null || $profiles->numRows() === 0) echo "Пользователь не найден";
     else {
@@ -139,7 +139,7 @@ if ($modPortalArgs['obj_id'] === 'list') {
             if (file_exists($path_blog)) {
                 include_once($path_blog);
                 $clsModPortalObjBlog = new ModPortalObjBlog($section_id, $page_id);
-                list($blogs, $blog_count, $blog_exists) = get_info($clsModPortalObjBlog, 'get_publication', $modPortalArgs['obj_id']);
+                list($blogs, $blog_count, $blog_exists) = get_info($clsModPortalObjBlog,, $modPortalArgs['obj_id']);
             } else { list($blogs, $blog_count, $blog_exists) = [[], 0, false]; }
             
             // получаем проекты
@@ -148,7 +148,7 @@ if ($modPortalArgs['obj_id'] === 'list') {
             if (file_exists($path_project)) {
                 include_once($path_project);
                 $clsModPortalObjProject = new ModPortalObjProject($section_id, $page_id);            
-                list($projects, $project_count, $project_exists) = get_info($clsModPortalObjProject, 'get_project', $modPortalArgs['obj_id']);
+                list($projects, $project_count, $project_exists) = get_info($clsModPortalObjProject, $modPortalArgs['obj_id']);
             } else { list($projects, $project_count, $project_exists) = [[], 0, false]; }
 
             // получаем недвижимости
@@ -157,7 +157,7 @@ if ($modPortalArgs['obj_id'] === 'list') {
             if (file_exists($path_apartment)) {
                 include_once($path_apartment);
                 $clsModPortalObjEstate = new ModPortalObjEstate($section_id, $page_id);            
-                list($apartments, $apartment_count, $apartment_exists) = get_info($clsModPortalObjEstate, 'get_apartment', $modPortalArgs['obj_id']);
+                list($apartments, $apartment_count, $apartment_exists) = get_info($clsModPortalObjEstate, $modPortalArgs['obj_id']);
             } else { list($apartments, $apartment_count, $apartment_exists) = [[], 0, false]; }
 
             // конвертируем дату предыдущего входа
