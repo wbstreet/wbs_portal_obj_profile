@@ -122,69 +122,33 @@ class ModPortalObjProfile extends ModPortalObj {
     }*/
 
     function get_obj($sets=[], $only_count=false) {
-        global $sql_builder, $database;
+        global $database;
 
-        $is_deleted = isset($sets['is_deleted']) ? $database->escapeString($sets['is_deleted']) : null;
-        $is_moder = isset($sets['is_moder']) ? $sets['is_moder'] : null;
+        $where = [
+            "{$this->tbl_profile}.`obj_id`={$this->tbl_obj_settings}.`obj_id`",
+            "{$this->tbl_obj_settings}.`obj_type_id`=".process_value($this->obj_type_id),
+            "{$this->tbl_profile}.`user_id`={$this->tbl_wb_users}.`user_id`"
+        ];
+        $this->_getobj_where($sets, $where);
 
-        if (isset($sets['limit_offset'])) $limit_offset = (integer)($sets['limit_offset']); else $limit_offset = null;
-        if (isset($sets['limit_count'])) $limit_count = (integer)($sets['limit_count']); else $limit_count = null;
-        if (isset($sets['find_str'])) $find_str = $database->escapeString($sets['find_str']); else $find_str = null;
-
-        $order_by = isset($sets['order_by']) ? glue_keys($sets['order_by']) : null;
-        $order_dir = isset($sets['order_dir']) ? $database->escapeString($sets['order_dir']) : null;
-
-        $where = [];
-
-        //$sql_builder->add_raw_where('1=1');
-        if (isset($sets['obj_id'])) $where[] = "{$this->tbl_profile}.`obj_id`=".process_value($sets['obj_id']);
-        //if (isset($sets['settlement_id']) && $sets['settlement_id'] !== null) $where[] = '`settlement_id`='.process_value($sets['settlement_id']);
-        if (isset($sets['is_active']) && $sets['is_active'] !== null) $where[] = "{$this->tbl_obj_settings}.`is_active`=".process_value($sets['is_active']);
-        if (isset($sets['is_moder']) && $sets['is_moder'] !== null) $where[] = "{$this->tbl_obj_settings}.`moder_status`=".process_value($sets['is_moder']);
-        if (isset($sets['is_deleted']) && $sets['is_deleted'] !== null) $where[] = "{$this->tbl_obj_settings}.`is_deleted`=".process_value($sets['is_deleted']);
-
-        if (isset($sets['page_id']) && $sets['page_id'] !== null) $where[] = "{$this->tbl_obj_settings}.`page_id`=".process_value($sets['page_id']);
-        if (isset($sets['section_id']) && $sets['section_id'] !== null) $where[] = "{$this->tbl_obj_settings}.`section_id`=".process_value($sets['section_id']);
- 
         if (isset($sets['user_id']) && $sets['user_id'] !== null) $where[] = "{$this->tbl_profile}.`user_id`=".process_value($sets['user_id']);
- 
+
+        if (isset($sets['find_str'])) $find_str = $database->escapeString($sets['find_str']); else $find_str = null; 
         if ( $find_str !== null ) {
             $find_str = str_replace('%', '\%', $find_str);
-            $find_like = "{$this->tbl_blog}.`name` LIKE '%$find_str%'";
+            $where[] = "{$this->tbl_blog}.`name` LIKE '%$find_str%'";
         }
-
-        $where[] = "{$this->tbl_profile}.`obj_id`={$this->tbl_obj_settings}.`obj_id` AND {$this->tbl_obj_settings}.`obj_type_id`=".process_value($this->obj_type_id)." AND {$this->tbl_profile}.`user_id`={$this->tbl_wb_users}.`user_id`";
-        if ( $find_str !== null ) $where[] = "($find_like)";
 
         $where = implode(' AND ', $where);
-
         $select = $only_count ? "COUNT(obj_id) AS count" : "*";
+        $order_limit = $this->_getobj_order_limit($sets);
 
-        if ( $order_by !== null ) {
-            $order = " ORDER BY $order_by ";
-            if ( $order_dir !== null ) $order .= " $order_dir ";
-        } else $order = '';
-
-        $limit = build_limit($limit_offset, $limit_count);
-
-        $sql = "SELECT
-        $select
-        FROM {$this->tbl_profile}, {$this->tbl_obj_settings}, {$this->tbl_wb_users} WHERE $where $order $limit";
+        $sql = "SELECT $select FROM {$this->tbl_profile}, {$this->tbl_obj_settings}, {$this->tbl_wb_users} WHERE $where $order_limit";
         
         //return $sql;
-
         //echo "<script>console.log(`".htmlentities($sql)."`);</script>";
 
-        $r = $database->query($sql);
-        if ($database->is_error()) return $database->get_error();
-
-        if ($only_count) {
-            $count = $r->fetchRow()['count'];
-            return (integer)$count;
-        } else {
-            if ($r->numRows() === 0) return null;
-            return $r;
-        }
+        return $this->_getobj_return($sql, $only_count);
     }
     
     function get_skills($sets=[]) {
