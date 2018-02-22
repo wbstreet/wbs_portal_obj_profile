@@ -133,12 +133,6 @@ class ModPortalObjProfile extends ModPortalObj {
 
         if (isset($sets['user_id']) && $sets['user_id'] !== null) $where[] = "{$this->tbl_profile}.`user_id`=".process_value($sets['user_id']);
 
-        if (isset($sets['find_str'])) $find_str = $database->escapeString($sets['find_str']); else $find_str = null; 
-        if ( $find_str !== null ) {
-            $find_str = str_replace('%', '\%', $find_str);
-            $where[] = "{$this->tbl_blog}.`name` LIKE '%$find_str%'";
-        }
-
         $where = implode(' AND ', $where);
         $select = $only_count ? "COUNT(obj_id) AS count" : "*";
         $order_limit = $this->_getobj_order_limit($sets);
