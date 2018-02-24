@@ -4,19 +4,6 @@ $path_core = __DIR__.'/../wbs_portal/lib.class.portal.php';
 if (file_exists($path_core )) include($path_core );
 else echo "<script>console.log('Модуль wbs_portal_obj_profile требует модуль wbs_portal')</script>";
 
-// используется только в данном файле. Пока неизвестно, включать её в sql_tools.php или нет.
-if (!function_exists('guess_operator')) {
-function guess_operator($value, $inverse=false) {
-        if ($value === 'NULL') {
-                if ($inverse) return ' is not ';
-                else {return ' is ';}
-        } else {
-                if ($inverse) return '!=';
-                else {return '=';}
-        }
-}
-}
-
 if (!class_exists('ModPortalObjProfile')) { 
 class ModPortalObjProfile extends ModPortalObj {
 
@@ -154,6 +141,25 @@ class ModPortalObjProfile extends ModPortalObj {
 
         return select_row($tables, '*', implode(' AND ', $where));
     }
+
+   function get_link($user_id=false) {
+        $tables = [$this->tbl_section_settings, '`'.TABLE_PREFIX.'pages`'];
+        $where = [
+            $this->tbl_section_settings.'.`page_id`=`'.TABLE_PREFIX.'pages`.`page_id`',
+            $this->tbl_section_settings.'.`section_obj_type`='.process_value($this->obj_type_id),
+            $this->tbl_section_settings.'.`section_is_active`=1',
+            ];
+            
+        $r = select_row($tables, '*', implode(' AND ', $where)." LIMIT 1");
+        if (gettype($r) === 'string') return [$r, false];
+        else if ($r === null) return ['Страница профиля не найдена', false];
+        $aPage = $r->fetchRow();
+        
+        $link =  page_link($aPage['link']);
+        if ($user_id !== false) $link .= '?obj_id='.$user_id;
+        
+        return [$link, true];
+   }
     
 }
 }

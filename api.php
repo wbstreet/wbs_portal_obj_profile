@@ -19,11 +19,11 @@ if ($action == 'add_skill') {
     if ($clsFilter->is_error()) $clsFilter->print_error();
 
     $fields = ['skill'=>$skill];
-    $skill_id = insert_row_uniq($clsModPortalObjProfile->tbl_profile_skill, $fields, false, 'skill_id') ;
+    list($skill_id, $isInserted) = insert_row_uniq($clsModPortalObjProfile->tbl_profile_skill, $fields, false, 'skill_id') ;
     if (gettype($skill_id) === 'string') print_error($skill_id);
 
     $fields = ['skill_id'=>$skill_id, 'user_id'=>$admin->get_user_id()];
-    $r = insert_row_uniq($clsModPortalObjProfile->tbl_profile_skill_user, $fields);
+    list($r, $isInserted) = insert_row_uniq($clsModPortalObjProfile->tbl_profile_skill_user, $fields);
     if (gettype($r) === 'string') print_error($r);
 
 	print_success('Специализация успешно добавлена!', ['data'=>['skill'=>$skill, 'skill_id'=>$skill_id], 'absent_fields'=>[]]);

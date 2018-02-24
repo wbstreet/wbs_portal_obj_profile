@@ -36,7 +36,13 @@
     </tr>
     <tr>
         <td>В предыдущий раз заходили:</td>
-        <td>{{ profile.login_when|date('r') }} с IP-адреса {{ profile.login_ip }}</td>
+        <td>
+            {% if can_edit %}
+                {{ profile.login_when|date('r') }} с IP-адреса {{ profile.login_ip }}
+            {% else %}
+                {{ profile.login_when|date('r') }}
+            {% endif %}
+        </td>
     </tr>
 
     <tr>

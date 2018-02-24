@@ -7,8 +7,12 @@ $clsModPortalObjProfile = new ModPortalObjProfile($page_id, $section_id);
 if ($admin->is_authenticated()) {$is_auth = true;}
 else { $is_auth = false; }
 
-if ($modPortalArgs['obj_id'] === null) { // здесь у нас не profile_id, а user_id.
-    $modPortalArgs['obj_id'] = $admin->get_user_id();
+$modPortalArgs['obj_id'] = $admin->get_user_id();  // здесь у нас не profile_id, а user_id.
+if ($_GET['username'] !== null) {
+    $r = select_row('`'.TABLE_PREFIX.'users`', '*', '`'.TABLE_PREFIX.'users`.`username`='.process_value($_GET['username']));
+    if (gettype($r) === 'string') $clsModPortalObjProfile->print_error($r);
+    else if ($r === null) $clsModPortalObjProfile->print_error('Страница профиля не найдена');
+    else $modPortalArgs['obj_id'] = $r->fetchRow()['user_id'];
 }
 
 
@@ -23,17 +27,17 @@ function get_info($clsModPortalObj, $obj_id) {
         // количество записей
     
         $obj_count = $clsModPortalObj->get_obj([
-            'user_owner_id'=>$modPortalArgs['obj_id'],
+            'user_owner_id'=>$obj_id,
             'is_active'=>1,
             'is_deleted'=>0,
             'is_created'=>'1',
             ], true);
-        if (gettype($blog_count) === 'string') { $clsModPortalObjBlog->print_error($obj_count); $obj_exists = false;}
+        if (gettype($obj_count) === 'string') { $clsModPortalObjBlog->print_error($obj_count); $obj_exists = false;}
     
         // первые пять записей
         
         $_objs = $clsModPortalObj->get_obj([
-            'user_owner_id'=>$modPortalArgs['obj_id'],
+            'user_owner_id'=>$obj_id,
             'is_active'=>1,
             'is_deleted'=>0,
             'limit_count'=>5,
@@ -129,7 +133,7 @@ if ($modPortalArgs['obj_id'] === 'list') {
             // получаем специализацию
             
             $skills = [];
-            $r = $clsModPortalObjProfile->get_skills(['user_id'=>$admin->get_user_id()]);
+            $r = $clsModPortalObjProfile->get_skills(['user_id'=>$modPortalArgs['obj_id']]);
             if (gettype($r) === 'string') {$clsModPortalObjProfile->print_error($r); $r = null; }
             while($r !== null && $row = $r->fetchRow()) $skills[] = $row;
 
