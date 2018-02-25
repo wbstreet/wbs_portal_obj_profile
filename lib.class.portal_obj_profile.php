@@ -156,7 +156,7 @@ class ModPortalObjProfile extends ModPortalObj {
         $aPage = $r->fetchRow();
         
         $link =  page_link($aPage['link']);
-        if ($user_id !== false) $link .= '?obj_id='.$user_id;
+        if ($user_id !== false) $link .= '?username='.$user_id;
         
         return [$link, true];
    }
