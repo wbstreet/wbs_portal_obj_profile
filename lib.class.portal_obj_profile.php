@@ -108,7 +108,7 @@ class ModPortalObjProfile extends ModPortalObj {
         return true;
     }*/
 
-    function get_obj($sets=[], $only_count=false) {
+    /*function get_obj($sets=[], $only_count=false) {
         global $database;
 
         $where = [
@@ -122,14 +122,34 @@ class ModPortalObjProfile extends ModPortalObj {
 
         $where = implode(' AND ', $where);
         $select = $only_count ? "COUNT(obj_id) AS count" : "*";
-        $order_limit = $this->_getobj_order_limit($sets);
+        $order_limit = getobj_order_limit($sets);
 
         $sql = "SELECT $select FROM {$this->tbl_profile}, {$this->tbl_obj_settings}, {$this->tbl_wb_users} WHERE $where $order_limit";
         
         //return $sql;
         //echo "<script>console.log(`".htmlentities($sql)."`);</script>";
 
-        return $this->_getobj_return($sql, $only_count);
+        return getobj_return($sql, $only_count);
+    }*/
+
+    function get_obj($sets=[], $only_count=false) {
+
+        $tables = [$this->tbl_profile, $this->tbl_obj_settings, $this->tbl_wb_users];
+
+        $where = [
+            "{$this->tbl_profile}.`obj_id`={$this->tbl_obj_settings}.`obj_id`",
+            "{$this->tbl_obj_settings}.`obj_type_id`=".process_value($this->obj_type_id),
+            "{$this->tbl_profile}.`user_id`={$this->tbl_wb_users}.`user_id`"
+        ];
+        $this->_getobj_where($sets, $where);
+        
+        $where_opts = [
+                'user_id'=>"{$this->tbl_profile}.`user_id`",
+                ];
+        
+        $where_find = [];
+        
+        return get_obj($tables, $where, $where_opts, $where_find, $sets, $only_count);
     }
     
     function get_skills($sets=[]) {
