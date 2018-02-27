@@ -32,4 +32,4 @@ if (gettype($r) === 'string') $admin->print_error($r);
 
 $r = $GLOBALS['cls'.$class_name]->install();
 if (gettype($r) === 'string') $admin->print_error($r);
-?> 
+?>
